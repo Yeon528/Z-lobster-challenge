@@ -1768,9 +1768,15 @@ async function sendWebhookNotification(record) {
         });
         const result = await response.json();
         console.log('Webhook 发送结果:', result);
+        if (result.code !== 0) {
+            showToast('通知发送失败: ' + (result.msg || '未知错误'), 'error');
+        } else {
+            showToast('通知已发送！', 'success');
+        }
         return result.code === 0;
     } catch (err) {
         console.error('Webhook 发送失败:', err);
+        showToast('通知发送异常: ' + err.message, 'error');
         return false;
     }
 }
