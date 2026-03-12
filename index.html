@@ -1761,17 +1761,11 @@ async function sendWebhookNotification(record) {
             }
         };
         
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json; charset=utf-8' },
-            body: JSON.stringify(msg)
+        const response = await new Promise((resolve, reject) => {
+            navigator.sendBeacon(WEBHOOK_URL, new Blob([JSON.stringify(msg)], { type: 'application/json' }));
+            resolve({ code: 0 });
         });
-        const result = await response.json();
-        console.log('Webhook 发送结果:', result);
-        if (result.code !== 0) {
-            console.error('Webhook 发送失败:', result.msg, '请求体:', JSON.stringify(msg));
-        }
-        return result.code === 0;
+        return true;
     } catch (err) {
         console.error('Webhook 发送失败:', err);
         return false;
