@@ -1493,8 +1493,8 @@
                     <label>参赛方式 <span class="required">*</span></label>
                     <select id="type" required>
                         <option value="">请选择参赛方式</option>
-                        <option value="独行虾">🦐 独行虾（1人成队）</option>
-                        <option value="联盟虾">🦞 联盟虾（2-5人组队）</option>
+                        <option value="独行虾">🦞 独行虾（1人成队）</option>
+                        <option value="联盟虾">🦞🦞 联盟虾（2-5人组队）</option>
                     </select>
                 </div>
 
@@ -1732,6 +1732,7 @@ function handleRegisterClick(e) {
 async function sendWebhookNotification(record) {
     try {
         const typeEmoji = record.type === '独行虾' ? '🦐' : '🦞';
+        const timeStr = new Date(record.time).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
         const msg = {
             msg_type: "interactive",
             card: {
@@ -1744,43 +1745,17 @@ async function sendWebhookNotification(record) {
                 },
                 elements: [
                     {
+                        tag: "div",
                         fields: [
-                            {
-                                is_short: true,
-                                text: {
-                                    tag: "lark_md",
-                                    content: "**参赛者姓名**\n" + record.name
-                                }
-                            },
-                            {
-                                is_short: true,
-                                text: {
-                                    tag: "lark_md",
-                                    content: "**参赛方式**\n" + typeEmoji + " " + record.type
-                                }
-                            },
-                            {
-                                is_short: true,
-                                text: {
-                                    tag: "lark_md",
-                                    content: "**龙虾昵称**\n" + record.lobsterName
-                                }
-                            },
-                            {
-                                is_short: true,
-                                text: {
-                                    tag: "lark_md",
-                                    content: "**报名时间**\n" + new Date(record.time).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
-                                }
-                            }
+                            { is_short: true, text: { tag: "lark_md", content: "**参赛者姓名**\n" + record.name } },
+                            { is_short: true, text: { tag: "lark_md", content: "**参赛方式**\n" + typeEmoji + " " + record.type } },
+                            { is_short: true, text: { tag: "lark_md", content: "**龙虾昵称**\n" + record.lobsterName } },
+                            { is_short: true, text: { tag: "lark_md", content: "**报名时间**\n" + timeStr } }
                         ]
                     },
                     {
                         tag: "div",
-                        text: {
-                            tag: "lark_md",
-                            content: "**龙虾简介**\n" + (record.lobsterDesc || '暂无')
-                        }
+                        text: { tag: "lark_md", content: "**龙虾简介**\n" + (record.lobsterDesc || '暂无') }
                     }
                 ]
             }
@@ -1788,11 +1763,14 @@ async function sendWebhookNotification(record) {
         
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json; charset=utf-8' },
             body: JSON.stringify(msg)
         });
         const result = await response.json();
         console.log('Webhook 发送结果:', result);
+        if (result.code !== 0) {
+            console.error('Webhook 发送失败:', result.msg, '请求体:', JSON.stringify(msg));
+        }
         return result.code === 0;
     } catch (err) {
         console.error('Webhook 发送失败:', err);
