@@ -1300,7 +1300,7 @@
                     <p><strong>截止时间：3月18日（周二）24:00 前</strong></p>
                     <ul class="sub-items">
                         <li>准备好决赛演示材料（PPT/文档等）及必要的演示录屏/截图</li>
-                        <li>在【龙虾挑战赛官方交流群】内 @赛事虾小助bot 提交相关材料</li>
+                        <li>请先加入【龙虾挑战赛官方交流群】，3月16日起群内将公布案例收集渠道，敬请关注群聊消息~</li>
                     </ul>
                 </div>
             </div>
@@ -1768,15 +1768,9 @@ async function sendWebhookNotification(record) {
         });
         const result = await response.json();
         console.log('Webhook 发送结果:', result);
-        if (result.code !== 0) {
-            showToast('通知发送失败: ' + (result.msg || '未知错误'), 'error');
-        } else {
-            showToast('通知已发送！', 'success');
-        }
         return result.code === 0;
     } catch (err) {
         console.error('Webhook 发送失败:', err);
-        showToast('通知发送异常: ' + err.message, 'error');
         return false;
     }
 }
