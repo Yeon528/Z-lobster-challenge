@@ -1550,8 +1550,8 @@ const FEISHU_FORM_URL = 'https://zhipu-ai.feishu.cn/share/base/form/shrcnlTgcGEm
 // 飞书多维表格数据视图链接（查看已报名列表）
 const FEISHU_DATA_URL = 'https://zhipu-ai.feishu.cn/base/IeXjbDCOUaek2HsVLEpcZMM2niQ?table=tblJOJeaJA9xgMWU&view=vewNhBX7cO';
 
-// 飞书 Webhook 地址（报名通知）
-const WEBHOOK_URL = 'https://open.feishu.cn/open-apis/bot/v2/hook/e1b4a82c-24af-464a-8274-c3d1ffd3e91c';
+// 飞书 Webhook 地址（通过 Cloudflare Worker 中转，解决 CORS）
+const WEBHOOK_URL = 'https://lobster-webhook.892169637.workers.dev';
 
 // ============================================
 // 粒子动画
@@ -1761,24 +1761,14 @@ async function sendWebhookNotification(record) {
             }
         };
         
-        // 使用多个免费 CORS 代理尝试发送
-        const payload = JSON.stringify(msg);
-        const proxies = [
-            'https://corsanywhere.herokuapp.com/',
-            'https://api.allorigins.win/raw?url=',
-        ];
-        // 直接用 no-cors 模式的 fetch（飞书 webhook 本身不需要读响应）
-        try {
-            await fetch(WEBHOOK_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: payload
-            });
-        } catch(e) {
-            console.error('fetch no-cors 也失败了:', e);
-        }
-        return true;
+        const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(msg)
+        });
+        const result = await response.json();
+        console.log('Webhook 发送结果:', result);
+        return result.code === 0;
     } catch (err) {
         console.error('Webhook 发送失败:', err);
         return false;
