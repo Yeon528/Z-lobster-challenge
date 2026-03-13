@@ -60,14 +60,36 @@
                 radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.06) 0%, transparent 50%),
                 radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.05) 0%, transparent 50%),
                 var(--bg-primary);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 0.3s ease;
+            animation: bgFlow 20s ease-in-out infinite alternate;
         }
 
-        /* 粒子装饰 */
+        @keyframes bgFlow {
+            0% {
+                background-position: center, 20% 50%, 80% 20%, 50% 100%;
+            }
+            100% {
+                background-position: center, 30% 60%, 70% 30%, 50% 110%;
+            }
+        }
+
+        // 粒子装饰
         .particles {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             z-index: -1;
             pointer-events: none;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
         /* 导航 */
@@ -95,20 +117,9 @@
             height: 64px;
         }
 
-        .nav-logo {
-            font-size: 1.3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #8b5cf6, #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-logo span {
-            font-size: 1.5rem;
+        .nav-logo img {
+            height: 24px;
+            width: auto;
         }
 
         .nav-links {
@@ -139,8 +150,9 @@
         }
 
         .nav-register:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px var(--accent-glow);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6) !important;
         }
 
         /* 移动端汉堡菜单 */
@@ -179,7 +191,16 @@
             color: var(--accent-light);
             font-size: 0.85rem;
             margin-bottom: 32px;
-            animation: fadeInUp 0.8s ease;
+            animation: fadeInUp 0.8s ease, glowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+            }
         }
 
         .hero h1 {
@@ -187,22 +208,29 @@
             font-weight: 800;
             line-height: 1.2;
             margin-bottom: 24px;
-            animation: fadeInUp 0.8s ease 0.1s both;
+            opacity: 1;
         }
 
         .hero h1 .gradient-text {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 24px;
             background: var(--accent-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: fadeInUp 0.8s ease 0.1s both;
+            opacity: 1;
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--text-secondary);
             max-width: 600px;
             margin: 0 auto 40px;
             animation: fadeInUp 0.8s ease 0.2s both;
+            opacity: 1;
         }
 
         .hero-actions {
@@ -225,17 +253,76 @@
             cursor: pointer;
             border: none;
             transition: all 0.3s;
+            position: relative;
+            overflow: visible;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .btn .glow-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease;
+            box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow);
+        }
+
+        .btn .glow-particle:nth-child(1) { left: 50%; top: 50%; }
+        .btn .glow-particle:nth-child(2) { left: 50%; top: 50%; }
+        .btn .glow-particle:nth-child(3) { left: 50%; top: 50%; }
+        .btn .glow-particle:nth-child(4) { left: 50%; top: 50%; }
+        .btn .glow-particle:nth-child(5) { left: 50%; top: 50%; }
+
+        .btn:hover .glow-particle {
+            opacity: 0.9;
+            animation: glowPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.8);
+                box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent-glow), 0 0 60px var(--accent);
+            }
         }
 
         .btn-primary {
             background: var(--accent-gradient);
             color: white;
             box-shadow: 0 4px 15px var(--accent-glow);
+            border: 2px solid var(--accent-light);
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent), 0 0 15px var(--accent-glow);
+            }
+            50% {
+                box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 30px var(--accent-glow);
+            }
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--accent-glow);
+            box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent), 0 8px 30px var(--accent-glow);
         }
 
         .btn-secondary {
@@ -329,30 +416,85 @@
 
         .participants-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
         }
 
+        /* 翻转卡片 */
         .participant-card {
             background: var(--bg-card);
             border: 1px solid var(--border-light);
             border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
+            height: 300px;
+            perspective: 1000px;
+            cursor: pointer;
+            overflow: hidden;
         }
 
-        .participant-card:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--border);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .participant-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
         }
 
         .participant-avatar {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .participant-avatar.alliance {
+            font-size: 2rem;
+        }
+
+        .participant-type {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 6px 16px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+        }
+
+        .flip-card-front h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .lobster-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 12px 0;
+        }
             width: 48px;
             height: 48px;
             border-radius: 12px;
@@ -369,40 +511,6 @@
         .participant-avatar.alliance {
             font-size: 1rem;
             width: 56px;
-        }
-
-        .participant-info {
-            position: relative;
-            flex: 1;
-        }
-
-        .participant-info h4 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin-bottom: 2px;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .participant-name {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .participant-type {
-            position: absolute;
-            top: 0;
-            right: 0;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--accent-light);
-            padding: 3px 10px;
-            background: rgba(139, 92, 246, 0.15);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 20px;
         }
 
         .participants-empty {
@@ -704,9 +812,91 @@
             box-shadow: 0 12px 40px rgba(0,0,0,0.3);
         }
 
+        .prize-card:hover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light), var(--accent));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        .prize-card:hover::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 24px;
+            background: radial-gradient(circle, rgba(139,92,246,0.5) 0%, transparent 70%);
+            opacity: 0;
+            animation: glowFade 0.5s ease forwards;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes glowFade {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                opacity: 1;
+                filter: brightness(1);
+            }
+            50% {
+                opacity: 0.7;
+                filter: brightness(1.3);
+            }
+        }
+
+        .prize-card:hover .number-scroll {
+            position: relative;
+        }
+
+        .prize-card:hover .number-scroll::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            animation: numberProgress 1.5s ease-out forwards;
+        }
+
+        @keyframes numberProgress {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
         .prize-card.featured {
-            border-color: var(--accent);
-            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(6,182,212,0.05));
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(6,182,212,0.05));
+            animation: goldPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes goldPulse {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            }
         }
 
         .prize-card.featured::before {
@@ -714,7 +904,18 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: var(--accent-gradient);
+            background: linear-gradient(90deg, #ffd700, #ffed4a, #ffd700);
+            background-size: 200% 100%;
+            animation: goldGlow 2s linear infinite;
+        }
+
+        @keyframes goldGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 200% 50%;
+            }
         }
 
         .prize-icon {
@@ -746,6 +947,58 @@
             margin-bottom: 8px;
         }
 
+        .prize-amount.featured {
+            background: linear-gradient(135deg, #ffd700, #ffed4a, #ffd700);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: goldShimmer 2s linear infinite;
+        }
+
+        @keyframes goldShimmer {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        /* 奖项阶梯入场动画 */
+        .prizes-grid .prize-card {
+            opacity: 0;
+            transform: translateY(50px);
+            animation: staggerFadeIn 0.8s ease forwards;
+        }
+
+        .prizes-grid .prize-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+        .prizes-grid .prize-card:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        .prizes-grid .prize-card:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        .prizes-grid .prize-card:nth-child(4) {
+            animation-delay: 0.5s;
+        }
+        .prizes-grid .prize-card:nth-child(5) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes staggerFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .prize-count {
             font-size: 0.85rem;
             color: var(--text-muted);
@@ -754,6 +1007,35 @@
         .prize-card.everyone .prize-amount {
             font-size: 1rem;
             -webkit-text-fill-color: var(--success);
+        }
+
+        /* 数字滚动动画 */
+        .number-scroll {
+            font-variant-numeric: tabular-nums;
+            position: relative;
+            display: inline-block;
+        }
+
+        .prize-card:hover .number-scroll::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-gradient);
+            animation: numberScroll 1s ease forwards;
+        }
+
+        @keyframes numberScroll {
+            0% {
+                width: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 100%;
+                opacity: 1;
+            }
         }
 
         /* FAQ */
@@ -1095,7 +1377,7 @@
 <nav id="navbar">
     <div class="nav-inner">
         <div class="nav-logo">
-            <span>🦞</span> 智谱龙虾挑战赛
+            <img src="./logo.svg" alt="智谱 ZAI" style="height: 24px; width: auto;">
         </div>
         <button class="nav-toggle" onclick="toggleNav()">☰</button>
         <ul class="nav-links" id="navLinks">
@@ -1112,7 +1394,7 @@
 <!-- Hero -->
 <section class="hero">
     <div class="hero-content">
-        <img src="data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C%21--%20Generator%3A%20Adobe%20Illustrator%2025.3.1%2C%20SVG%20Export%20Plug-In%20.%20SVG%20Version%3A%206.00%20Build%200%29%20%20--%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22%E5%9B%BE%E5%B1%82_1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20xmlns%3Axlink%3D%22http%3A//www.w3.org/1999/xlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20viewBox%3D%220%200%20600%20170%22%20style%3D%22enable-background%3Anew%200%200%20600%20170%3B%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cstyle%20type%3D%22text/css%22%3E%0A%09.st0%7Bfill%3Aurl%28%23SVGID_1_%29%3B%7D%0A%09.st1%7Bfill%3Aurl%28%23SVGID_2_%29%3B%7D%0A%09.st2%7Bfill%3Aurl%28%23SVGID_3_%29%3B%7D%0A%09.st3%7Bfill%3Aurl%28%23SVGID_4_%29%3B%7D%0A%09.st4%7Bfill%3Aurl%28%23SVGID_5_%29%3B%7D%0A%09.st5%7Bfill%3Aurl%28%23SVGID_6_%29%3B%7D%0A%09.st6%7Bfill%3Aurl%28%23SVGID_7_%29%3B%7D%0A%09.st7%7Bfill%3Aurl%28%23SVGID_8_%29%3B%7D%0A%09.st8%7Bfill%3Aurl%28%23SVGID_9_%29%3B%7D%0A%09.st9%7Bfill%3Aurl%28%23SVGID_10_%29%3B%7D%0A%09.st10%7Bfill%3Aurl%28%23SVGID_11_%29%3B%7D%0A%09.st11%7Bfill%3Aurl%28%23SVGID_12_%29%3B%7D%0A%3C/style%3E%0A%3Cg%3E%0A%09%3Cg%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_1_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22515.6129%22%20y1%3D%22-61.5427%22%20x2%3D%22555.6129%22%20y2%3D%22149.4573%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st0%22%20d%3D%22M562.1%2C69.6V29.9h32.6V15.2h-24l3.5-7.6l-13.3-6.3l-6.3%2C13.9h-30.3L518%2C1.4l-13.7%2C6.3l3.6%2C7.6h-24.1v14.6%0A%09%09%09h32.9v39.8h-37.9v14.6H600V69.6H562.1z%20M547.1%2C69.6h-15.8V29.9h15.8V69.6z%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_2_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22442.7978%22%20y1%3D%22-47.7389%22%20x2%3D%22482.7978%22%20y2%3D%22163.2611%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st1%22%20d%3D%22M471.9%2C38c-2.5-5.6-11.2-23.2-16.3-30.9l-13.9%2C7c5%2C7.6%2C13.8%2C25.1%2C16.1%2C30.9L471.9%2C38z%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_3_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22428.6772%22%20y1%3D%22-45.062%22%20x2%3D%22468.6772%22%20y2%3D%22165.938%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st2%22%20d%3D%22M467.1%2C128.9V56.1h-30.3v14.6h15.3v70.8c-5.4%2C4.4-9.5%2C7.6-10.8%2C8.7l8.9%2C11.2c19.8-14.9%2C33.6-28.9%2C36.1-31.5%0A%09%09%09l-9.5-10.3C473.9%2C122.9%2C470.9%2C125.6%2C467.1%2C128.9z%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_4_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22502.7622%22%20y1%3D%22-59.1066%22%20x2%3D%22542.7621%22%20y2%3D%22151.8934%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st3%22%20d%3D%22M490%2C169.9h98.6V97.1H490V169.9z%20M504.9%2C112.1c0%2C0%2C5.7%2C0%2C20.2%2C0c12.7%2C0%2C48.6%2C0%2C48.6%2C0v14h-68.9L504.9%2C112.1%0A%09%09%09L504.9%2C112.1z%20M504.9%2C140.9h68.9v14.1h-68.9V140.9z%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_5_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22476.5683%22%20y1%3D%22-54.1409%22%20x2%3D%22516.5683%22%20y2%3D%22156.8591%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpolygon%20class%3D%22st4%22%20points%3D%22498.4%2C35.6%20485%2C40.8%20494.6%2C64.6%20507.6%2C59.1%20%09%09%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_6_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22559.4753%22%20y1%3D%22-69.8579%22%20x2%3D%22599.4753%22%20y2%3D%22141.1421%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpolygon%20class%3D%22st5%22%20points%3D%22584.3%2C64.6%20593.6%2C41.2%20580.6%2C35.6%20570.9%2C59.5%20%09%09%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_7_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22286.8866%22%20y1%3D%22-18.1823%22%20x2%3D%22326.8866%22%20y2%3D%22192.8177%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st6%22%20d%3D%22M303.5%2C69.9c2.1%2C1.2%2C16.4%2C9.9%2C29.4%2C19.2c2.4-4%2C5-9.2%2C7-12.8c-12.8-8.6-29.3-18.6-29.3-18.6l0%2C0l1.1-2.6h29%0A%09%09%09V41.5h-29.4V24.7h27.2V11.1h-52c1-2.2%2C1.9-4.5%2C2.6-6.4l-12.9-4.8c-3.5%2C8.4-10%2C20.8-15.4%2C28.8l12.6%2C6.9c1.9-2.9%2C4.1-6.7%2C6.4-10.8%0A%09%09%09h16.8v16.7h-35.8v13.6h33.9c0%2C0-4%2C9.2-13.4%2C16c-7.2%2C5.2-14.6%2C8.9-21.2%2C11.4l4.6%2C14c7-2.3%2C14.8-6.2%2C22.5-11.2%0A%09%09%09C294.5%2C80.6%2C299.8%2C74.8%2C303.5%2C69.9z%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_8_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22312.5286%22%20y1%3D%22-23.0433%22%20x2%3D%22352.5286%22%20y2%3D%22187.9567%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st7%22%20d%3D%22M280%2C169.9h124.2V95.5H280V169.9z%20M294.8%2C110.5h94.4v14.9h-0.1h-94.3L294.8%2C110.5L294.8%2C110.5z%20M294.8%2C140.2%0A%09%09%09h94.3v14.9h-94.3L294.8%2C140.2L294.8%2C140.2z%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_9_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22366.8312%22%20y1%3D%22-33.3377%22%20x2%3D%22406.8312%22%20y2%3D%22177.6623%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st8%22%20d%3D%22M349.6%2C81.5h64.3V9.1h-64.3V81.5z%20M364.4%2C23.7h34.9v43.1h-34.9V23.7z%22/%3E%0A%09%3C/g%3E%0A%09%3Cg%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_10_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%2257.3783%22%20y1%3D%2225.3264%22%20x2%3D%2297.3783%22%20y2%3D%22236.3264%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st9%22%20d%3D%22M105%2C0.1L91%2C20c-2.2%2C3.1-5.8%2C5-9.7%2C5H5v-25C5%2C0.1%2C105%2C0.1%2C105%2C0.1z%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_11_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%2287.5499%22%20y1%3D%2219.6067%22%20x2%3D%22127.5499%22%20y2%3D%22230.6067%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpolygon%20class%3D%22st10%22%20points%3D%22200%2C0.1%2080%2C170.1%200%2C170.1%20120%2C0.1%20%09%09%22/%3E%0A%09%09%3ClinearGradient%20id%3D%22SVGID_12_%22%20gradientUnits%3D%22userSpaceOnUse%22%20x1%3D%22117.7167%22%20y1%3D%2213.8878%22%20x2%3D%22157.7167%22%20y2%3D%22224.8878%22%3E%0A%09%09%09%3Cstop%20%20offset%3D%224.399238e-04%22%20style%3D%22stop-color%3A%23FFFFFF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.1493%22%20style%3D%22stop-color%3A%23F6F8FB%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%220.6871%22%20style%3D%22stop-color%3A%23DAE3EF%22/%3E%0A%09%09%09%3Cstop%20%20offset%3D%221%22%20style%3D%22stop-color%3A%23D0DBEA%22/%3E%0A%09%09%3C/linearGradient%3E%0A%09%09%3Cpath%20class%3D%22st11%22%20d%3D%22M95%2C170.1l14.1-20c2.2-3.1%2C5.8-5%2C9.7-5H195v25H95z%22/%3E%0A%09%3C/g%3E%0A%3C/g%3E%0A%3C/svg%3E%0A" style="height:22px;margin-bottom:16px;display:block;margin-left:auto;margin-right:auto;opacity:0.85;" alt="智谱 ZAI">
+
         <div class="hero-badge">🔥 AutoClaw × GLM 创新大赛</div>
         <h1>
             <span class="gradient-text">智谱龙虾挑战赛</span>
@@ -1129,15 +1411,15 @@
                 <div class="timeline-label">报名开始 🚀</div>
             </div>
             <div class="timeline-item">
-                <div class="timeline-date">3.18</div>
+                <div class="timeline-date">3.24</div>
                 <div class="timeline-label">材料截止 📝</div>
             </div>
             <div class="timeline-item">
-                <div class="timeline-date">3.19</div>
+                <div class="timeline-date">3.26</div>
                 <div class="timeline-label">决赛名单公示 📋</div>
             </div>
             <div class="timeline-item">
-                <div class="timeline-date">3.20</div>
+                <div class="timeline-date">3.27</div>
                 <div class="timeline-label">巅峰对决 🏆</div>
             </div>
         </div>
@@ -1211,39 +1493,39 @@
         </div>
 
         <div class="prizes-grid animate-on-scroll">
-            <div class="prize-card featured">
+            <div class="prize-card featured" data-amount="10000">
                 <div class="prize-icon">👑</div>
                 <div class="prize-rank">特等奖</div>
                 <div class="prize-name">MVP 龙虾</div>
-                <div class="prize-amount">¥10,000</div>
+                <div class="prize-amount number-scroll featured">¥10,000</div>
                 <div class="prize-count">1 只虾</div>
             </div>
-            <div class="prize-card">
+            <div class="prize-card" data-amount="5000">
                 <div class="prize-icon">🥇</div>
                 <div class="prize-rank">一等奖</div>
                 <div class="prize-name">王牌龙虾</div>
-                <div class="prize-amount">¥5,000</div>
+                <div class="prize-amount number-scroll">¥5,000</div>
                 <div class="prize-count">1 只虾</div>
             </div>
-            <div class="prize-card">
+            <div class="prize-card" data-amount="3000">
                 <div class="prize-icon">🥈</div>
                 <div class="prize-rank">二等奖</div>
                 <div class="prize-name">精英龙虾</div>
-                <div class="prize-amount">¥3,000</div>
+                <div class="prize-amount number-scroll">¥3,000</div>
                 <div class="prize-count">2 只虾</div>
             </div>
-            <div class="prize-card">
+            <div class="prize-card" data-amount="1000">
                 <div class="prize-icon">🥉</div>
                 <div class="prize-rank">三等奖</div>
                 <div class="prize-name">先锋龙虾</div>
-                <div class="prize-amount">¥1,000</div>
+                <div class="prize-amount number-scroll">¥1,000</div>
                 <div class="prize-count">3 只虾</div>
             </div>
             <div class="prize-card everyone" style="grid-column: 1 / -1;">
                 <div class="prize-icon">🎁</div>
                 <div class="prize-rank">阳光虾友奖</div>
                 <div class="prize-name">所有参赛虾</div>
-                <div class="prize-amount">定制帆布袋 + 定制小龙虾玩偶</div>
+                <div class="prize-amount number-scroll">定制帆布袋 + 定制小龙虾玩偶</div>
                 <div class="prize-count">参与即有！</div>
             </div>
         </div>
@@ -1296,7 +1578,7 @@
                 <div class="step-number">4</div>
                 <div class="step-content">
                     <h3>📤 材料提交</h3>
-                    <p><strong>截止时间：3月18日（周二）24:00 前</strong></p>
+                    <p><strong>截止时间：3月24日（周二）24:00 前</strong></p>
                     <ul class="sub-items">
                         <li>准备好决赛演示材料（PPT/文档等）及必要的演示录屏/截图</li>
                         <li>请先加入【龙虾挑战赛官方交流群】，3月16日起群内将公布案例收集渠道，敬请关注群聊消息~</li>
@@ -1321,12 +1603,12 @@
         <div class="section-header animate-on-scroll">
             <div class="badge">🏆 Rules</div>
             <h2>决赛规则</h2>
-            <p>3月20日，巅峰对决</p>
+            <p>3月27日，巅峰对决</p>
         </div>
 
         <div class="rules-grid animate-on-scroll">
             <div class="rule-card">
-                <h3>📋 入围名单公示（3月19日）</h3>
+                <h3>📋 入围名单公示</h3>
                 <p>根据专家初筛评分，筛选出最终入围决赛的选手名单。名单及案例简介将通过内部渠道公示，接受全员监督。</p>
             </div>
             <div class="rule-card">
@@ -1456,7 +1738,7 @@
 
                 <div class="faq-item">
                     <button class="faq-question" onclick="toggleFaq(this)">
-                        进了决赛但 3月20日 出差/请假怎么办？
+                        进了决赛但当天要出差/请假怎么办？
                         <span class="faq-arrow">▼</span>
                     </button>
                     <div class="faq-answer">
@@ -1558,6 +1840,8 @@ const WEBHOOK_URL = 'https://lobster-webhook.892169637.workers.dev';
 const canvas = document.getElementById('particles');
 const ctx = canvas.getContext('2d');
 let particles = [];
+let mouseX = 0;
+let mouseY = 0;
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -1575,40 +1859,79 @@ function createParticles() {
             vy: (Math.random() - 0.5) * 0.3,
             radius: Math.random() * 2 + 0.5,
             opacity: Math.random() * 0.5 + 0.1,
+            hue: Math.random() * 60 + 250, // 紫色到蓝色范围
         });
     }
 }
 
 function animateParticles() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     particles.forEach((p, i) => {
         p.x += p.vx;
         p.y += p.vy;
+
+        // 边界反弹
         if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
         if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
+        // 绘制粒子
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(139, 92, 246, ${p.opacity})`;
+        ctx.fillStyle = `hsla(${p.hue}, 80%, 60%, ${p.opacity})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `hsla(${p.hue}, 80%, 60%, 0.5)`;
         ctx.fill();
+        ctx.shadowBlur = 0;
 
         // 连线
         for (let j = i + 1; j < particles.length; j++) {
             const dx = p.x - particles[j].x;
             const dy = p.y - particles[j].y;
             const dist = Math.sqrt(dx * dx + dy * dy);
+
             if (dist < 120) {
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
                 ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 * (1 - dist / 120)})`;
+
+                // 渐变连线
+                const gradient = ctx.createLinearGradient(p.x, p.y, particles[j].x, particles[j].y);
+                gradient.addColorStop(0, `hsla(${p.hue}, 80%, 60%, ${0.1 * (1 - dist / 120)})`);
+                gradient.addColorStop(1, `hsla(${particles[j].hue}, 80%, 60%, ${0.1 * (1 - dist / 120)})`);
+
+                ctx.strokeStyle = gradient;
                 ctx.lineWidth = 0.5;
                 ctx.stroke();
             }
         }
     });
+
+    // 绘制鼠标跟随粒子
+    const mouseParticleCount = 8;
+    for (let i = 0; i < mouseParticleCount; i++) {
+        const angle = (Date.now() / 1000 + i * (Math.PI * 2 / mouseParticleCount)) % (Math.PI * 2);
+        const radius = 30 + Math.sin(Date.now() / 500 + i) * 10;
+        const x = mouseX + Math.cos(angle) * radius;
+        const y = mouseY + Math.sin(angle) * radius;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${240 + Math.sin(Date.now() / 1000 + i) * 30}, 90%, 65%, 0.8)`; // 紫色系
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = `hsla(${240 + Math.sin(Date.now() / 1000 + i) * 30}, 90%, 65%, 0.5)`;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+
     requestAnimationFrame(animateParticles);
 }
+
+// 鼠标移动跟踪
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
 
 resizeCanvas();
 createParticles();
@@ -1691,13 +2014,17 @@ function renderParticipants() {
     }
 
     grid.innerHTML = participants.map((p, i) => `
-        <div class="participant-card" style="animation: fadeInUp 0.5s ease ${i * 0.05}s both;">
-            <div class="participant-avatar${p.type === '联盟虾' ? ' alliance' : ''}">${p.type === '联盟虾' ? '🦞🦞🦞' : '🦞'}</div>
-            <div class="participant-info">
-                <span class="participant-type">${escapeHtml(p.type)}</span>
-                <h4>🦞 ${escapeHtml(p.lobsterName)}</h4>
-                <div class="participant-name">👤 ${escapeHtml(p.name)}</div>
-                ${p.lobsterDesc ? `<p style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">${escapeHtml(p.lobsterDesc)}</p>` : ''}
+        <div class="participant-card flip-card" style="animation: fadeInUp 0.5s ease ${i * 0.05}s both;">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <div class="flip-card-content">
+                        <span class="participant-type">${escapeHtml(p.type)}</span>
+                    </div>
+                    <h4>🦞 ${escapeHtml(p.lobsterName)}</h4>
+                </div>
+                <div class="flip-card-back">
+                    ${p.lobsterDesc ? `<p class="lobster-desc">${escapeHtml(p.lobsterDesc)}</p>` : ''}
+                </div>
             </div>
         </div>
     `).join('');
@@ -1715,7 +2042,7 @@ renderParticipants();
 
 // 设置飞书链接
 document.getElementById('feishuFormLink').href = FEISHU_FORM_URL;
-document.getElementById('feishuDataLink').href = FEISHU_DATA_URL;
+// document.getElementById('feishuDataLink').href = FEISHU_DATA_URL; // 元素不存在，已注释
 
 // Hero 报名按钮 — 平滑滚动到报名区
 function handleRegisterClick(e) {
@@ -1858,6 +2185,127 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
+
+// ============================================
+// 按钮光圈跟随鼠标效果
+// ============================================
+const buttons = document.querySelectorAll('.btn');
+
+buttons.forEach(button => {
+    // 创建多个粒子
+    const particleCount = 5;
+    const particles = [];
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'glow-particle';
+        button.appendChild(particle);
+        particles.push({
+            element: particle,
+            offsetX: (Math.random() - 0.5) * 40,
+            offsetY: (Math.random() - 0.5) * 40,
+            delay: Math.random() * 0.5
+        });
+    }
+
+    button.addEventListener('mousemove', (e) => {
+        const rect = button.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        particles.forEach((p, i) => {
+            const x = mouseX + p.offsetX;
+            const y = mouseY + p.offsetY;
+            p.element.style.left = `${x}px`;
+            p.element.style.top = `${y}px`;
+            p.element.style.animationDelay = `${p.delay}s`;
+        });
+    });
+
+    button.addEventListener('mouseleave', () => {
+        particles.forEach(p => {
+            p.element.style.left = '50%';
+            p.element.style.top = '50%';
+        });
+    });
+});
+
+// ============================================
+// 奖项卡片数字滚动动画
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    const prizeCards = document.querySelectorAll('.prize-card');
+
+    console.log('Found prize cards:', prizeCards.length);
+
+    prizeCards.forEach((card, index) => {
+        card.addEventListener('mouseenter', () => {
+            const amountElement = card.querySelector('.number-scroll');
+            console.log(`Card ${index}: Found element:`, amountElement);
+
+            if (amountElement) {
+                const text = amountElement.textContent;
+                console.log(`Card ${index}: Text:`, text);
+
+                // 提取数字部分
+                const match = text.match(/[\d,]+/);
+                console.log(`Card ${index}: Match:`, match);
+
+                if (match && match[0]) {
+                    const cleanNumber = match[0].replace(/,/g, '');
+                    const displayText = match[0];
+
+                    console.log(`Card ${index}: Clean number:`, cleanNumber, 'Display:', displayText);
+
+                    // 动画滚动到数字
+                    const target = parseInt(cleanNumber, 10);
+                    console.log(`Card ${index}: Target:`, target);
+
+                    if (!isNaN(target)) {
+                        // 使用固定的动画时长
+                        const duration = 1000;
+                        const startTime = performance.now();
+                        let animationId;
+
+                        function animate(currentTime) {
+                            const elapsed = currentTime - startTime;
+                            const progress = Math.min(elapsed / duration, 1);
+
+                            // 缓动函数
+                            const easeOut = 1 - Math.pow(1 - progress, 3);
+                            const currentNumber = Math.floor(target * easeOut);
+
+                            console.log(`Card ${index}: Current:`, currentNumber);
+
+                            // 更新显示
+                            amountElement.textContent = currentNumber.toLocaleString();
+
+                            if (progress < 1) {
+                                animationId = requestAnimationFrame(animate);
+                            } else {
+                                // 动画完成后恢复原始文本
+                                amountElement.textContent = displayText;
+                                console.log(`Card ${index}: Animation complete`);
+                                // 取消可能存在的其他动画
+                                cancelAnimationFrame(animationId);
+                            }
+                        }
+
+                        // 取消之前的动画（如果存在）
+                        cancelAnimationFrame(animationId);
+                        animationId = requestAnimationFrame(animate);
+                    } else {
+                        console.log(`Card ${index}: Target is NaN`);
+                    }
+                } else {
+                    console.log(`Card ${index}: No match found`);
+                }
+            } else {
+                console.log(`Card ${index}: No element found`);
+            }
+        });
+    });
+});
 </script>
 
 </body>
