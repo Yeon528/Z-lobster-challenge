@@ -1463,7 +1463,7 @@
             </div>
             <div class="overview-card">
                 <div class="icon">🤝</div>
-                <h3>参赛方式</h3>
+                <h3>参赛单位</h3>
                 <p><strong>独行虾：</strong>1人成队<br><strong>联盟虾：</strong>2-5人组队</p>
             </div>
             <div class="overview-card">
@@ -1771,9 +1771,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label>参赛方式 <span class="required">*</span></label>
+                    <label>参赛单位 <span class="required">*</span></label>
                     <select id="type" required>
-                        <option value="">请选择参赛方式</option>
+                        <option value="">请选择参赛单位</option>
                         <option value="独行虾">🦞 独行虾（1人成队）</option>
                         <option value="联盟虾">🦞🦞 联盟虾（2-5人组队）</option>
                     </select>
@@ -2074,7 +2074,7 @@ async function sendWebhookNotification(record) {
                         tag: "div",
                         fields: [
                             { is_short: true, text: { tag: "lark_md", content: "**参赛者姓名**\n" + record.name } },
-                            { is_short: true, text: { tag: "lark_md", content: "**参赛方式**\n" + typeEmoji + " " + record.type } },
+                            { is_short: true, text: { tag: "lark_md", content: "**参赛单位**\n" + typeEmoji + " " + record.type } },
                             { is_short: true, text: { tag: "lark_md", content: "**龙虾昵称**\n" + record.lobsterName } },
                             { is_short: true, text: { tag: "lark_md", content: "**报名时间**\n" + timeStr } }
                         ]
@@ -2310,5 +2310,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+
 
 
