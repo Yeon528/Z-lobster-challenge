@@ -1983,59 +1983,41 @@ function toggleFaq(btn) {
 // 参赛者数据管理
 // ============================================
 
-// 从 localStorage 加载参赛者数据
-function getParticipants() {
+const API_BASE = 'https://lobster-webhook.892169637.workers.dev';
+
+async function getParticipants() {
     try {
-        return JSON.parse(localStorage.getItem('lobster_participants') || '[]');
-    } catch { return []; }
+        const res = await fetch(`${API_BASE}/registrations`);
+        if (res.ok) return await res.json();
+    } catch (err) { console.error('获取数据失败:', err); }
+    return [];
 }
 
-// 保存参赛者数据到 localStorage
-function saveParticipants(data) {
-    localStorage.setItem('lobster_participants', JSON.stringify(data));
-}
-
-// 渲染参赛者列表
 function renderParticipants() {
-    const participants = getParticipants();
     const grid = document.getElementById('participantsGrid');
     const count = document.getElementById('participantCount');
-    count.textContent = participants.length;
-
-    if (participants.length === 0) {
-        grid.innerHTML = `
-            <div class="participants-empty" style="grid-column: 1/-1;">
-                <div class="emoji">🦞</div>
-                <p>还没有选手报名，成为第一个挑战者吧！</p>
-            </div>`;
-        return;
-    }
-
-    grid.innerHTML = participants.map((p, i) => `
-        <div class="participant-card flip-card" style="animation: fadeInUp 0.5s ease ${i * 0.05}s both;">
-            <div class="flip-card-inner">
-                <div class="flip-card-front">
-                    <div class="flip-card-content">
-                        <span class="participant-type">${escapeHtml(p.type)}</span>
+    count.textContent = '...';
+    getParticipants().then(participants => {
+        count.textContent = participants.length;
+        if (participants.length === 0) {
+            grid.innerHTML = '<div class="participants-empty" style="grid-column:1/-1"><div class="emoji">🦞</div><p>还没有选手报名，成为第一个挑战者吧！</p></div>';
+            return;
+        }
+        grid.innerHTML = participants.map((p, i) => `
+            <div class="participant-card flip-card" style="animation:fadeInUp 0.5s ease ${i*0.05}s both">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="flip-card-content"><span class="participant-type">${escapeHtml(p.type)}</span></div>
+                        <h4>🦞 ${escapeHtml(p.lobsterName)}</h4>
                     </div>
-                    <h4>🦞 ${escapeHtml(p.lobsterName)}</h4>
+                    <div class="flip-card-back">
+                        ${p.lobsterDesc ? `<p class="lobster-desc">${escapeHtml(p.lobsterDesc)}</p>` : ''}
+                    </div>
                 </div>
-                <div class="flip-card-back">
-                    ${p.lobsterDesc ? `<p class="lobster-desc">${escapeHtml(p.lobsterDesc)}</p>` : ''}
-                </div>
-            </div>
-        </div>
-    `).join('');
+            </div>`).join('');
+    });
 }
 
-// HTML 转义防 XSS
-function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-// 初始渲染
 renderParticipants();
 
 // 设置飞书链接
@@ -2101,16 +2083,38 @@ async function sendWebhookNotification(record) {
 
 async function handleSubmit(e) {
     e.preventDefault();
-
     const name = document.getElementById('name').value.trim();
     const type = document.getElementById('type').value;
     const lobsterName = document.getElementById('lobsterName').value.trim();
     const lobsterDesc = document.getElementById('lobsterDesc').value.trim();
+    if (!name || !type || !lobsterName) { showToast('请填写所有必填项', 'warning'); return; }
 
-    if (!name || !type || !lobsterName) {
-        showToast('请填写所有必填项', 'warning');
-        return;
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '📤 正在提交...';
+
+    try {
+        const res = await fetch(`${API_BASE}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, type, lobsterName, lobsterDesc }),
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+            renderParticipants();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('formSuccess').classList.add('show');
+            showToast('报名成功！🦞', 'success');
+            setTimeout(() => document.querySelector('.participants-section').scrollIntoView({ behavior: 'smooth', block: 'center' }), 800);
+        } else {
+            throw new Error(result.error || '提交失败');
+        }
+    } catch (err) {
+        showToast('提交失败，请稍后重试', 'error');
+        btn.disabled = false;
+        btn.textContent = '🦞 提交报名';
     }
+}
 
     const record = { name, type, lobsterName, lobsterDesc, time: new Date().toISOString() };
 
