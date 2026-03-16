@@ -1368,6 +1368,7 @@
             background: #8b5cf6;
         }
     </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1826,11 +1827,9 @@
 // 飞书多维表格表单链接（报名跳转）
 const FEISHU_FORM_URL = 'https://zhipu-ai.feishu.cn/share/base/form/shrcnlTgcGEmS2sQKz2EI5ulUzf';
 
-// 飞书多维表格数据视图链接（查看已报名列表）
-const FEISHU_DATA_URL = 'https://zhipu-ai.feishu.cn/base/IeXjbDCOUaek2HsVLEpcZMM2niQ?table=tblJOJeaJA9xgMWU&view=vewNhBX7cO';
-
-// 飞书 Webhook 地址（通过 Cloudflare Worker 中转，解决 CORS）
-const WEBHOOK_URL = 'https://lobster-webhook.892169637.workers.dev';
+const SUPABASE_URL = 'https://xjflisfswitugglgsqtb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_mJADGqJ9uZEJq6OacMEYEA_i4HHXnBt';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================
 // 粒子动画
@@ -1983,52 +1982,47 @@ function toggleFaq(btn) {
 // 参赛者数据管理
 // ============================================
 
-const API_BASE = 'https://lobster-webhook.892169637.workers.dev';
-
+// 参赛者数据管理
 async function getParticipants() {
-    try {
-        const res = await fetch(`${API_BASE}/registrations`);
-        if (res.ok) return await res.json();
-    } catch (err) { console.error('获取数据失败:', err); }
-    return [];
+  try {
+    const { data, error } = await supabase.from('registrations').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  } catch (err) { console.error('获取数据失败:', err); return []; }
 }
-    
+
 function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
-    
+
 function renderParticipants() {
-    const grid = document.getElementById('participantsGrid');
-    const count = document.getElementById('participantCount');
-    count.textContent = '...';
-    getParticipants().then(participants => {
-        count.textContent = participants.length;
-        if (participants.length === 0) {
-            grid.innerHTML = '<div class="participants-empty" style="grid-column:1/-1"><div class="emoji">🦞</div><p>还没有选手报名，成为第一个挑战者吧！</p></div>';
-            return;
-        }
-        grid.innerHTML = participants.map((p, i) => `
-            <div class="participant-card flip-card" style="animation:fadeInUp 0.5s ease ${i*0.05}s both">
-                <div class="flip-card-inner">
-                    <div class="flip-card-front">
-                        <div class="flip-card-content"><span class="participant-type">${escapeHtml(p.type)}</span></div>
-                        <h4>🦞 ${escapeHtml(p.lobsterName)}</h4>
-                    </div>
-                    <div class="flip-card-back">
-                        ${p.lobsterDesc ? `<p class="lobster-desc">${escapeHtml(p.lobsterDesc)}</p>` : ''}
-                    </div>
-                </div>
-            </div>`).join('');
-    });
+  const grid = document.getElementById('participantsGrid');
+  const count = document.getElementById('participantCount');
+  count.textContent = '...';
+  getParticipants().then(participants => {
+    count.textContent = participants.length;
+    if (participants.length === 0) {
+      grid.innerHTML = '<div class="participants-empty" style="grid-column:1/-1"><div class="emoji">🦞</div><p>还没有选手报名，成为第一个挑战者吧！</p></div>';
+      return;
+    }
+    grid.innerHTML = participants.map((p, i) => `
+      <div class="participant-card flip-card" style="animation:fadeInUp 0.5s ease ${i*0.05}s both">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-card-content"><span class="participant-type">${escapeHtml(p.type)}</span></div>
+            <h4>🦞 ${escapeHtml(p.lobster_name)}</h4>
+          </div>
+          <div class="flip-card-back">
+            ${p.lobster_desc ? `<p class="lobster-desc">${escapeHtml(p.lobster_desc)}</p>` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+  });
 }
 
 renderParticipants();
-
-// 设置飞书链接
-document.getElementById('feishuFormLink').href = FEISHU_FORM_URL;
-// document.getElementById('feishuDataLink').href = FEISHU_DATA_URL; // 元素不存在，已注释
 
 // Hero 报名按钮 — 平滑滚动到报名区
 function handleRegisterClick(e) {
@@ -2040,88 +2034,30 @@ function handleRegisterClick(e) {
 // 报名提交（网页内快速报名）
 // ============================================
 
-// 发送飞书 Webhook 通知
-async function sendWebhookNotification(record) {
-    try {
-        const typeEmoji = record.type === '独行虾' ? '🦐' : '🦞';
-        const timeStr = new Date(record.time).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
-        const msg = {
-            msg_type: "interactive",
-            card: {
-                header: {
-                    title: {
-                        tag: "plain_text",
-                        content: "🦞 新龙虾报名！"
-                    },
-                    template: "blue"
-                },
-                elements: [
-                    {
-                        tag: "div",
-                        fields: [
-                            { is_short: true, text: { tag: "lark_md", content: "**参赛者姓名**\n" + record.name } },
-                            { is_short: true, text: { tag: "lark_md", content: "**参赛单位**\n" + typeEmoji + " " + record.type } },
-                            { is_short: true, text: { tag: "lark_md", content: "**龙虾昵称**\n" + record.lobsterName } },
-                            { is_short: true, text: { tag: "lark_md", content: "**报名时间**\n" + timeStr } }
-                        ]
-                    },
-                    {
-                        tag: "div",
-                        text: { tag: "lark_md", content: "**龙虾简介**\n" + (record.lobsterDesc || '暂无') }
-                    }
-                ]
-            }
-        };
-        
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(msg)
-        });
-        const result = await response.json();
-        console.log('Webhook 发送结果:', result);
-        return result.code === 0;
-    } catch (err) {
-        console.error('Webhook 发送失败:', err);
-        return false;
-    }
-}
-
 async function handleSubmit(e) {
-    e.preventDefault();
-    const name = document.getElementById('name').value.trim();
-    const type = document.getElementById('type').value;
-    const lobsterName = document.getElementById('lobsterName').value.trim();
-    const lobsterDesc = document.getElementById('lobsterDesc').value.trim();
-    if (!name || !type || !lobsterName) { showToast('请填写所有必填项', 'warning'); return; }
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = '📤 正在提交...';
-
-    try {
-        const res = await fetch(`${API_BASE}/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, type, lobsterName, lobsterDesc }),
-        });
-        const result = await res.json();
-        if (res.ok && result.success) {
-            renderParticipants();
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('formSuccess').classList.add('show');
-            showToast('报名成功！🦞', 'success');
-            setTimeout(() => document.querySelector('.participants-section').scrollIntoView({ behavior: 'smooth', block: 'center' }), 800);
-        } else {
-            throw new Error(result.error || '提交失败');
-        }
-    } catch (err) {
-        showToast('提交失败，请稍后重试', 'error');
-        btn.disabled = false;
-        btn.textContent = '🦞 提交报名';
-    }
+  e.preventDefault();
+  const name = document.getElementById('name').value.trim();
+  const type = document.getElementById('type').value;
+  const lobsterName = document.getElementById('lobsterName').value.trim();
+  const lobsterDesc = document.getElementById('lobsterDesc').value.trim();
+  if (!name || !type || !lobsterName) { showToast('请填写所有必填项', 'warning'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '📤 正在提交...';
+  try {
+    const { error } = await supabase.from('registrations').insert([{ name, type, lobster_name: lobsterName, lobster_desc: lobsterDesc }]);
+    if (error) throw error;
+    renderParticipants();
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('formSuccess').classList.add('show');
+    showToast('报名成功！🦞', 'success');
+    setTimeout(() => document.querySelector('.participants-section').scrollIntoView({ behavior: 'smooth', block: 'center' }), 800);
+  } catch (err) {
+    showToast('提交失败，请稍后重试', 'error');
+    btn.disabled = false;
+    btn.textContent = '🦞 提交报名';
+  }
 }
-
 
 function resetForm() {
     document.getElementById('registerForm').style.display = 'block';
