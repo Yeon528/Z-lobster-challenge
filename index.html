@@ -1368,7 +1368,7 @@
             background: #8b5cf6;
         }
     </style>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
 </head>
 <body>
 
@@ -1829,7 +1829,11 @@ const FEISHU_FORM_URL = 'https://zhipu-ai.feishu.cn/share/base/form/shrcnlTgcGEm
 
 const SUPABASE_URL = 'https://xjflisfswitugglgsqtb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_mJADGqJ9uZEJq6OacMEYEA_i4HHXnBt';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
 
 // ============================================
 // 粒子动画
@@ -1985,9 +1989,9 @@ function toggleFaq(btn) {
 // 参赛者数据管理
 async function getParticipants() {
   try {
-    const { data, error } = await supabase.from('registrations').select('*').order('created_at', { ascending: true });
-    if (error) throw error;
-    return data || [];
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/registrations?select=*&order=created_at.asc`, { headers: SUPABASE_HEADERS });
+    if (!res.ok) throw new Error(res.statusText);
+    return await res.json();
   } catch (err) { console.error('获取数据失败:', err); return []; }
 }
 
@@ -2045,8 +2049,15 @@ async function handleSubmit(e) {
   btn.disabled = true;
   btn.textContent = '📤 正在提交...';
   try {
-    const { error } = await supabase.from('registrations').insert([{ name, type, lobster_name: lobsterName, lobster_desc: lobsterDesc }]);
-    if (error) throw error;
+const res = await fetch(`${SUPABASE_URL}/rest/v1/registrations`, {
+  method: 'POST',
+  headers: SUPABASE_HEADERS,
+  body: JSON.stringify([{ name, type, lobster_name: lobsterName, lobster_desc: lobsterDesc }])
+});
+if (!res.ok) {
+  const errData = await res.json().catch(() => ({}));
+  throw new Error(errData.message || res.statusText);
+}
     renderParticipants();
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('formSuccess').classList.add('show');
